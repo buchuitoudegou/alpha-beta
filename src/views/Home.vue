@@ -4,6 +4,7 @@
     :x="piece.coord.x" :y="piece.coord.y" :types="piece.piece.types"
     :isDead="piece.piece.isDead" :group="piece.piece.group"
     @select="pieceOnSelect"></PieceComponent>
+    <img src="../assets/img/MAX/r_box.png" style="position: absolute"/>
     <div class="map" @click="pieceOnMove"></div>
   </div>
 </template>
