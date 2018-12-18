@@ -4,13 +4,13 @@ export interface Coord {
 }
 
 export interface Piece {
-  types: 'car' | 'horse' | 'elephant' | 'general' | 'guard' | 'cannon';
-  group: 'MAX' | 'MIN';
+  types: 'car' | 'horse' | 'elephant' | 'general' | 'guard' | 'cannon' | 'soldier' | 'null';
+  group: 'MAX' | 'MIN' | 'null';
   isDead: boolean;
 }
 
 export interface State {
-  pieceInMap: Map<Coord, Piece>;
+  pieceInMap: Piece[][];
 }
 
 export const MAX_WIDTH = 9;

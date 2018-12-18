@@ -9,6 +9,7 @@ import situation from '@/store/modules/situation';
 export default Vue.extend({
   created() {
     this.$store.registerModule('situation', situation);
+    this.$store.commit(`situation/INITIAL`);
   },
 });
 </script>

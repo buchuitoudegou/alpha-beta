@@ -4,37 +4,47 @@ import { Coord, Piece, State, MAX_WIDTH, MAX_HEIGHT } from './typings';
 export const MOVE = 'MOVE';
 export const ADD = 'ADD';
 export const MAP = 'MAP';
+export const INITIAL = 'INITIAL';
+export const NULL_PIECE: Piece = {
+  types: 'null',
+  group: 'null',
+  isDead: true,
+};
 
 export default {
   namespaced: true,
   state: () => ({
-    pieceInMap: new Map<Coord, Piece>(),
+    pieceInMap: [[]],
   }),
   mutations: {
-    [MOVE](state: State, { from, to }: { from: Coord, to: Coord }) {
-      const curPiece = state.pieceInMap.get(from);
-      if (to.x < 0 || to.x >= MAX_WIDTH || to.y < 0 || to.y >= MAX_HEIGHT) {
-        return;
-      }
-      if (curPiece && curPiece.types === 'car') {
-        if (!state.pieceInMap.get(to)) {
-          state.pieceInMap.set(to, curPiece);
-        } else {
-          const piece = state.pieceInMap.get(to);
-          if (piece && piece.group === curPiece.group) {
-            return;
-          } else if (piece) {
-            state.pieceInMap.set(to, curPiece);
-          }
+    [INITIAL](state: State) {
+      state.pieceInMap = [];
+      for (let i = 0; i < MAX_WIDTH; ++i) {
+        const temp: Piece[] = [];
+        for (let j = 0; j < MAX_HEIGHT; ++j) {
+          temp.push(NULL_PIECE);
         }
+        state.pieceInMap.push(temp);
       }
     },
+    [MOVE](state: State, { from, to }: { from: Coord, to: Coord }) {
+      const curPiece = state.pieceInMap[from.x][from.y];
+      const toPiece = state.pieceInMap[to.x][to.y];
+      if (toPiece.types !== 'null') {
+        state.pieceInMap[to.x][to.y].isDead = true;
+      }
+      if (curPiece.types !== 'null') {
+        state.pieceInMap[to.x][to.y] = curPiece;
+        state.pieceInMap[from.x][from.y] = NULL_PIECE;
+      }
+
+    },
     [ADD](state: State, { pos, piece }: { pos: Coord, piece: Piece }) {
-      state.pieceInMap.set(pos, piece);
+      state.pieceInMap[pos.x][pos.y] = piece;
     },
   },
   getters: {
-    [MAP](state): Map<Coord, Piece> {
+    [MAP](state): Piece[][] {
       return state.pieceInMap;
     },
   },
