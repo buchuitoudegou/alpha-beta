@@ -5,7 +5,7 @@ export interface Coord {
 
 export interface Piece {
   types: 'car' | 'horse' | 'elephant' | 'general' | 'guard' | 'cannon' | 'soldier' | 'null';
-  group: 'MAX' | 'MIN' | 'null';
+  group: 'RED' | 'BLACK' | 'null';
   isDead: boolean;
 }
 

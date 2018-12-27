@@ -1,6 +1,6 @@
 <template>
   <img :src="require(`../assets/img/${this.group}/${this.types}.png`)" 
-  :style="pieceStyle" @click="select" draggable="false"/>
+  :style="pieceStyle" @click="select" draggable="false" class="piece"/>
 </template>
 <script lang="ts">
 import { Component, Vue, Prop } from 'vue-property-decorator';
@@ -28,3 +28,8 @@ export default class PieceComponent extends Vue {
   }
 }
 </script>
+<style>
+.piece {
+  transition: all 0.5s;
+}
+</style>

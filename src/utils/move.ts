@@ -5,7 +5,7 @@ export function isValidMove(
   piece: Piece,
   from: Coord,
   to: Coord,
-  turn: 'MAX' | 'MIN'
+  turn: 'RED' | 'BLACK'
 ): boolean {
   // wrong turn
   if (piece.group !== turn) {
@@ -139,7 +139,7 @@ export function isValidMove(
       }
     }
   } else if (piece.types === 'general') {
-    if (piece.group === 'MAX') {
+    if (piece.group === 'RED') {
       // bound in palace
       if (to.x < 3 || to.x > 5 || to.y > 2) {
         return false;
@@ -165,8 +165,8 @@ export function isValidMove(
       }
     }
   } else if (piece.types === 'guard') {
-    // MAX palace
-    if (piece.group === 'MAX') {
+    // RED palace
+    if (piece.group === 'RED') {
       if (from.x === 4 && from.y === 1) {
         if (!(to.x === 3 && to.y === 0) && !(to.x === 5 && to.y === 0) &&
           !(to.x === 3 && to.y === 2) && !(to.x === 5 && to.y === 2)) {
@@ -178,8 +178,8 @@ export function isValidMove(
         }
       }
     }
-    // MIN palace
-    if (piece.group === 'MIN') {
+    // BLACK palace
+    if (piece.group === 'BLACK') {
       if (from.x === 4 && from.y === 8) {
         if (!(to.x === 3 && to.y === 9) && !(to.x === 5 && to.y === 9) &&
           !(to.x === 3 && to.y === 7) && !(to.x === 5 && to.y === 7)) {
@@ -193,12 +193,12 @@ export function isValidMove(
     }
   } else if (piece.types === 'elephant') {
     // cannot cross the river
-    if (piece.group === 'MAX') {
+    if (piece.group === 'RED') {
       if (to.y > 4) {
         return false;
       }
     }
-    if (piece.group === 'MIN') {
+    if (piece.group === 'BLACK') {
       if (to.y <= 4) {
         return false;
       }
@@ -227,8 +227,8 @@ export function isValidMove(
         return false;
       }
     }
-    // MAX soldier
-    if (piece.group === 'MAX') {
+    // RED soldier
+    if (piece.group === 'RED') {
       // not allowed to go back
       if (from.y > to.y) {
         return false;
@@ -241,8 +241,8 @@ export function isValidMove(
         }
       }
     }
-    // MIN soldier
-    if (piece.group === 'MIN') {
+    // BLACK soldier
+    if (piece.group === 'BLACK') {
       // not allowed to go back
       if (from.y < to.y) {
         return false;

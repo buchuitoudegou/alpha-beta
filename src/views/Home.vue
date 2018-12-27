@@ -4,8 +4,11 @@
     :x="piece.coord.x" :y="piece.coord.y" :types="piece.piece.types"
     :isDead="piece.piece.isDead" :group="piece.piece.group"
     @select="pieceOnSelect"></PieceComponent>
-    <img src="../assets/img/MAX/r_box.png" style="position: absolute"/>
+    <img src="../assets/img/RED/r_box.png" :style="`position: absolute; \
+    top: ${selectedY * 55 + 20}px; left: ${selectedX * 55 + 158}px;`" v-if="selectedX !== -1">
     <div class="map" @click="pieceOnMove"></div>
+    <img src="../assets/img/BLACK/b_box.png" :style="`position: absolute; \
+    top: ${botY * 55 + 20}px; left: ${botX * 55 + 158}px;`" v-if="botX !== -1">
   </div>
 </template>
 
@@ -17,6 +20,7 @@ import PieceComponent from '../components/Piece.vue';
 import { isPrimitive } from 'vue-class-component/lib/util';
 import { isValidMove } from '../utils/move';
 import { initialMax, initialMin } from '../utils/InitialMap';
+import { evaluate, Node } from '../utils/evaluate';
 
 interface IPeiceInView {
   piece: Piece;
@@ -32,10 +36,24 @@ interface IPeiceInView {
 export default class Home extends Vue {
   pieceInView: IPeiceInView[] = [];
 
-  takeTurns: 'MAX' | 'MIN' = 'MAX';
-  selectedPos: Coord = {  x: -1, y: -1};
+  takeTurns: 'RED' | 'BLACK' = 'BLACK';
+  selectedPos: Coord = {  x: -1, y: -1 };
+
+  step = 0;
+
+  botX: number = -1;
+  botY: number = -1;
+
+  get selectedX() {
+    return this.selectedPos.x === -1 ? -1 : this.selectedPos.x;
+  }
+
+  get selectedY() {
+    return this.selectedPos.y === -1 ? 5 : this.selectedPos.y;
+  }
 
   pieceOnSelect(x: number, y: number) {
+    // console.log(x, y);
     if (this.selectedPos.x === -1 && this.selectedPos.y === -1) {
       this.selectedPos.x = x;
       this.selectedPos.y = y;
@@ -53,6 +71,7 @@ export default class Home extends Vue {
       this.update();
       this.selectedPos.x = -1;
       this.selectedPos.y = -1;
+      setTimeout(() => this.botMove(), 50);
     }
   }
 
@@ -71,11 +90,28 @@ export default class Home extends Vue {
       this.update();
       this.selectedPos.x = -1;
       this.selectedPos.y = -1;
+      setTimeout(() => this.botMove(), 50);
     }
   }
 
+  botMove() {
+    console.log('bot');
+    const curNode = new Node(this.$store.getters[`situation/${MAP}`], 'RED', 1, [], -999999, 999999);
+    curNode.findChildren();
+    // console.log(curNode);
+    const { from, to } = curNode.findNext();
+    this.botX = from.x;
+    this.botY = from.y;
+    setTimeout(() => {
+      this.$store.commit(`situation/${MOVE}`, { from: from, to: to });
+      this.update();
+      this.botX = -1;
+      this.botY = -1;
+    }, 1000);
+  }
+
   update() {
-    this.takeTurns = (this.takeTurns === 'MAX') ? 'MIN' : 'MAX';
+    this.takeTurns = (this.takeTurns === 'RED') ? 'BLACK' : 'RED';
     const map = this.$store.getters[`situation/${MAP}`];
     const updatePiece: IPeiceInView[] = [];
     for (let i = 0; i < MAX_WIDTH; ++i) {
@@ -86,6 +122,7 @@ export default class Home extends Vue {
       }
     }
     this.pieceInView = updatePiece;
+    // console.log(evaluate(this.$store.getters[`situation/${MAP}`]));
   }
 
   mounted() {
@@ -95,6 +132,7 @@ export default class Home extends Vue {
     this.pieceInView.forEach((val: IPeiceInView) => {
       this.$store.commit(`situation/${ADD}`, { pos: val.coord, piece: val.piece });
     });
+    // console.log(evaluate(this.$store.getters[`situation/${MAP}`]));
   }
 }
 </script>
@@ -116,7 +154,8 @@ export default class Home extends Vue {
   /* position: absolute; */
   width: 30rem;
   height: 33rem;
-  background-image: url('../assets/map.png');
+  background-image: url('../assets/img/RED/bg.png');
+  /* background-image: url('../assets/map.png'); */
   background-size: contain;
   background-repeat: no-repeat;
 }
