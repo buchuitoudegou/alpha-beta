@@ -95,7 +95,7 @@ export default class Home extends Vue {
   }
 
   botMove() {
-    console.log('bot');
+    // console.log('bot');
     const curNode = new Node(this.$store.getters[`situation/${MAP}`], 'RED', 1, [], -999999, 999999);
     curNode.findChildren();
     // console.log(curNode);
@@ -103,7 +103,7 @@ export default class Home extends Vue {
     this.botX = from.x;
     this.botY = from.y;
     setTimeout(() => {
-      this.$store.commit(`situation/${MOVE}`, { from: from, to: to });
+      this.$store.commit(`situation/${MOVE}`, { from, to });
       this.update();
       this.botX = -1;
       this.botY = -1;

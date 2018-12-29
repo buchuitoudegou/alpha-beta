@@ -311,8 +311,8 @@ export class Node {
         }
       }
     }
-    console.log(diff[0], this.data[diff[0].x][diff[0].y]);
-    console.log(diff[1], this.data[diff[1].x][diff[1].y]);
+    // console.log(diff[0], this.data[diff[0].x][diff[0].y]);
+    // console.log(diff[1], this.data[diff[1].x][diff[1].y]);
     if (this.data[diff[0].x][diff[0].y].group === this.group &&
        this.data[diff[0].x][diff[0].y].group !== 'null') {
       return {
