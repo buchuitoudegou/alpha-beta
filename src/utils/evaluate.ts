@@ -5,16 +5,37 @@ import { NULL_PIECE } from '@/store/modules/situation';
 const MAX_DEPTH = 4;
 
 
-export function isWin(src: Piece[][]): 'TIE' | 'RED' | 'BLACK' {
+export function isWin(src: Piece[][]): 'TIE' | 'RED' | 'BLACK' | 'FAULT' {
   let RED_ALIVE = false;
   let BLACK_ALIVE = false;
+  let RED_X = -1;
+  let RED_Y = -1;
+  let BLACK_X = -2;
+  let BLACK_Y = -2;
   for (let i = 0; i < MAX_WIDTH; ++i) {
     for (let j = 0; j < MAX_HEIGHT; ++j) {
       if (src[i][j].types === 'general' && src[i][j].group === 'RED') {
         RED_ALIVE = true;
+        RED_X = i;
+        RED_Y = j;
       } else if (src[i][j].types === 'general' && src[i][j].group === 'BLACK') {
         BLACK_ALIVE = true;
+        BLACK_X = i;
+        BLACK_Y = j;
       }
+    }
+  }
+  if (BLACK_X === RED_X) {
+    const step = (BLACK_Y - RED_Y) > 0 ? -1 : 1;
+    let flag = true;
+    for (let j = BLACK_Y; j !== RED_Y; j += step) {
+      if (src[BLACK_X][j].types !== 'general' && src[BLACK_X][j].types !== 'null') {
+        flag = false;
+        break;
+      }
+    }
+    if (flag) {
+      return 'FAULT';
     }
   }
   if (RED_ALIVE && BLACK_ALIVE) {
@@ -309,7 +330,7 @@ export class Node {
   }
   findNext(): { from: Coord, to: Coord } {
     let nextNode: Node = this.children[0];
-    console.log(this.value);
+    // console.log(this.value);
     this.children.forEach((node: Node) => {
       if (this.value === node.value) {
         nextNode = node;

@@ -5,6 +5,7 @@ export const MOVE = 'MOVE';
 export const ADD = 'ADD';
 export const MAP = 'MAP';
 export const INITIAL = 'INITIAL';
+export const CLEAR = 'CLEAR';
 export const NULL_PIECE: Piece = {
   types: 'null',
   group: 'null',
@@ -37,7 +38,16 @@ export default {
         state.pieceInMap[to.x][to.y] = curPiece;
         state.pieceInMap[from.x][from.y] = NULL_PIECE;
       }
-
+    },
+    [CLEAR](state: State) {
+      state.pieceInMap = [];
+      for (let i = 0; i < MAX_WIDTH; ++i) {
+        const temp: Piece[] = [];
+        for (let j = 0; j < MAX_HEIGHT; ++j) {
+          temp.push(NULL_PIECE);
+        }
+        state.pieceInMap.push(temp);
+      }
     },
     [ADD](state: State, { pos, piece }: { pos: Coord, piece: Piece }) {
       state.pieceInMap[pos.x][pos.y] = piece;
