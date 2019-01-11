@@ -20,7 +20,7 @@ import PieceComponent from '../components/Piece.vue';
 import { isPrimitive } from 'vue-class-component/lib/util';
 import { isValidMove } from '../utils/move';
 import { initialMax, initialMin } from '../utils/InitialMap';
-import { evaluate, Node } from '../utils/evaluate';
+import { evaluate, Node, isWin } from '../utils/evaluate';
 
 interface IPeiceInView {
   piece: Piece;
@@ -38,6 +38,7 @@ export default class Home extends Vue {
 
   takeTurns: 'RED' | 'BLACK' = 'BLACK';
   selectedPos: Coord = {  x: -1, y: -1 };
+  canMove: boolean = true;
 
   step = 0;
 
@@ -53,7 +54,9 @@ export default class Home extends Vue {
   }
 
   pieceOnSelect(x: number, y: number) {
-    // console.log(x, y);
+    if (!this.canMove) {
+      return;
+    }
     if (this.selectedPos.x === -1 && this.selectedPos.y === -1) {
       this.selectedPos.x = x;
       this.selectedPos.y = y;
@@ -76,6 +79,9 @@ export default class Home extends Vue {
   }
 
   pieceOnMove(event: MouseEvent) {
+    if (!this.canMove) {
+      return;
+    }
     if (this.selectedPos.x !== -1 && this.selectedPos.y !== -1) {
       const newX = Math.round((event.offsetX - 15) / 55);
       const newY = Math.round((event.offsetY - 15) / 55);
@@ -95,10 +101,12 @@ export default class Home extends Vue {
   }
 
   botMove() {
-    // console.log('bot');
-    const curNode = new Node(this.$store.getters[`situation/${MAP}`], 'RED', 1, [], -999999, 999999);
+    if (!this.canMove) {
+      return;
+    }
+    const method = this.step > 5 ? 'A-B' : 'MAX-MIN';
+    const curNode = new Node(this.$store.getters[`situation/${MAP}`], 'RED', 1, [], -9999999, 9999999, method);
     curNode.findChildren();
-    // console.log(curNode);
     const { from, to } = curNode.findNext();
     this.botX = from.x;
     this.botY = from.y;
@@ -112,6 +120,7 @@ export default class Home extends Vue {
 
   update() {
     this.takeTurns = (this.takeTurns === 'RED') ? 'BLACK' : 'RED';
+    this.step ++;
     const map = this.$store.getters[`situation/${MAP}`];
     const updatePiece: IPeiceInView[] = [];
     for (let i = 0; i < MAX_WIDTH; ++i) {
@@ -122,7 +131,11 @@ export default class Home extends Vue {
       }
     }
     this.pieceInView = updatePiece;
-    // console.log(evaluate(this.$store.getters[`situation/${MAP}`]));
+    const pieceStatus: string = isWin(map);
+    if (pieceStatus !== 'TIE') {
+      alert(pieceStatus + ' WIN!');
+      this.canMove = false;
+    }
   }
 
   mounted() {
@@ -132,7 +145,6 @@ export default class Home extends Vue {
     this.pieceInView.forEach((val: IPeiceInView) => {
       this.$store.commit(`situation/${ADD}`, { pos: val.coord, piece: val.piece });
     });
-    // console.log(evaluate(this.$store.getters[`situation/${MAP}`]));
   }
 }
 </script>

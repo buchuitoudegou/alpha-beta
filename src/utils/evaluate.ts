@@ -4,6 +4,28 @@ import { NULL_PIECE } from '@/store/modules/situation';
 
 const MAX_DEPTH = 4;
 
+
+export function isWin(src: Piece[][]): 'TIE' | 'RED' | 'BLACK' {
+  let RED_ALIVE = false;
+  let BLACK_ALIVE = false;
+  for (let i = 0; i < MAX_WIDTH; ++i) {
+    for (let j = 0; j < MAX_HEIGHT; ++j) {
+      if (src[i][j].types === 'general' && src[i][j].group === 'RED') {
+        RED_ALIVE = true;
+      } else if (src[i][j].types === 'general' && src[i][j].group === 'BLACK') {
+        BLACK_ALIVE = true;
+      }
+    }
+  }
+  if (RED_ALIVE && BLACK_ALIVE) {
+    return 'TIE';
+  } else if (RED_ALIVE) {
+    return 'RED';
+  } else {
+    return 'BLACK';
+  }
+}
+
 function arrDeepCopy(src: number[][]) {
   const newArr: number[][] = [];
   src.forEach((arr: number[]) => {
@@ -179,8 +201,9 @@ export class Node {
   value: number;
   alpha: number;
   beta: number;
+  searchMethod: 'A-B' | 'MAX-MIN';
   constructor(data: Piece[][], group: 'RED' | 'BLACK',
-              depth: number, children: Node[], alpha: number, beta: number) {
+              depth: number, children: Node[], alpha: number, beta: number, searchMethod: 'A-B' | 'MAX-MIN') {
     this.data = pieceMapCopy(data);
     this.group = group;
     this.depth = depth;
@@ -188,6 +211,7 @@ export class Node {
     this.value = -99999;
     this.alpha = alpha;
     this.beta = beta;
+    this.searchMethod = searchMethod;
   }
 
   findChildren() {
@@ -198,7 +222,7 @@ export class Node {
     if (this.group === 'RED') {
       // bot node
       // find out the least value of its children
-      let minValue = 9999999;
+      let minValue = 999999;
       for (let i = 0; i < MAX_WIDTH; ++i) {
         for (let j = 0; j < MAX_HEIGHT; ++j) {
           if (this.data[i][j].types === 'null' || this.data[i][j].group !== 'RED') {
@@ -217,36 +241,31 @@ export class Node {
                   temp[k][p] = curPiece;
                   temp[i][j] = NULL_PIECE;
                 }
-                const newNode = new Node(temp, 'BLACK', this.depth + 1, [], this.alpha, this.beta);
-                newNode.findChildren();
-                // console.log(newNode.value);
+                const newNode = new Node(temp, 'BLACK', this.depth + 1, [], this.alpha, this.beta, this.searchMethod);
+                if (isWin(newNode.data) === 'TIE') {
+                  newNode.findChildren();
+                } else {
+                  newNode.value = evaluate(newNode.data);
+                }
                 this.children.push(newNode);
                 if (minValue > newNode.value) {
                   minValue = newNode.value;
                   this.beta = minValue;
                 }
-              }
-              if (this.alpha >= this.beta) {
-                break;
+                if (this.alpha >= this.beta && this.searchMethod === 'A-B') {
+                  this.value = minValue;
+                  return;
+                }
               }
             }
-            if (this.alpha >= this.beta) {
-              break;
-            }
           }
-          if (this.alpha >= this.beta) {
-            break;
-          }
-        }
-        if (this.alpha >= this.beta) {
-          break;
         }
       }
       this.value = minValue;
     } else if (this.group === 'BLACK') {
       // player node
       // find out the max node of its children
-      let maxValue = -99999;
+      let maxValue = -999999;
       for (let i = 0; i < MAX_WIDTH; ++i) {
         for (let j = 0; j < MAX_HEIGHT; ++j) {
           if (this.data[i][j].types === 'null' || this.data[i][j].group !== 'BLACK') {
@@ -258,9 +277,6 @@ export class Node {
               if (isValidMove(temp, temp[i][j], { x: i, y: j }, { x: k, y: p }, 'BLACK')) {
                 const curPiece = temp[i][j];
                 const toPiece = temp[k][p];
-                // if (i === k && j === p) {
-                //   console.log(';aaa');
-                // }
                 if (toPiece.types !== 'null') {
                   temp[k][p].isDead = true;
                 }
@@ -268,28 +284,24 @@ export class Node {
                   temp[k][p] = curPiece;
                   temp[i][j] = NULL_PIECE;
                 }
-                const newNode = new Node(temp, 'RED', this.depth + 1, [], this.alpha, this.beta);
-                newNode.findChildren();
+                const newNode = new Node(temp, 'RED', this.depth + 1, [], this.alpha, this.beta, this.searchMethod);
+                if (isWin(newNode.data) === 'TIE') {
+                  newNode.findChildren();
+                } else {
+                  newNode.value = evaluate(newNode.data);
+                }
                 this.children.push(newNode);
                 if (maxValue < newNode.value) {
                   maxValue = newNode.value;
                   this.alpha = maxValue;
                 }
-              }
-              if (this.alpha >= this.beta) {
-                break;
+                if (this.alpha >= this.beta && this.searchMethod === 'A-B') {
+                  this.value = maxValue;
+                  return;
+                }
               }
             }
-            if (this.alpha >= this.beta) {
-              break;
-            }
           }
-          if (this.alpha >= this.beta) {
-            break;
-          }
-        }
-        if (this.alpha >= this.beta) {
-          break;
         }
       }
       this.value = maxValue;
@@ -311,8 +323,6 @@ export class Node {
         }
       }
     }
-    // console.log(diff[0], this.data[diff[0].x][diff[0].y]);
-    // console.log(diff[1], this.data[diff[1].x][diff[1].y]);
     if (this.data[diff[0].x][diff[0].y].group === this.group &&
        this.data[diff[0].x][diff[0].y].group !== 'null') {
       return {
