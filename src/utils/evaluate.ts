@@ -215,7 +215,7 @@ export class Node {
   }
 
   findChildren() {
-    if (this.depth >= MAX_DEPTH) {
+    if (this.depth >= MAX_DEPTH || (this.searchMethod === 'MAX-MIN' && this.depth >= MAX_DEPTH - 1)) {
       this.value = evaluate(this.data);
       return;
     }
@@ -309,6 +309,7 @@ export class Node {
   }
   findNext(): { from: Coord, to: Coord } {
     let nextNode: Node = this.children[0];
+    console.log(this.value);
     this.children.forEach((node: Node) => {
       if (this.value === node.value) {
         nextNode = node;
