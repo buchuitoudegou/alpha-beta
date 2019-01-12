@@ -5,19 +5,19 @@
       <h3>robot based on MAX-MIN SEARCH and ALPHA-BETA search</h3>
       <h3>without chess manual.</h3>
     </div>
-      <div style=" margin-left: 5rem;">
-        <h2 :style="`color: ${takeTurns === 'BLACK' ? 'black' : 'red'}`" v-if="winner === 'null'">{{ takeTurns }} Turn</h2>
-        <h2 :style="`color: ${winner === 'BLACK' ? 'black' : 'red'}`" v-if="winner !== 'null'">{{ winner }} Win!</h2>
+      <div style=" margin-left: 5rem; height: 100vh;">
+        <h2 :style="`color: ${takeTurns === 'BLACK' ? 'black' : 'red'}; margin: 0;`" v-if="winner === 'null'">{{ takeTurns }} Turn</h2>
+        <h2 :style="`color: ${winner === 'BLACK' ? 'black' : 'red'}; margin: 0;`" v-if="winner !== 'null'">{{ winner }} Win!</h2>
         <el-card class="home">
           <PieceComponent v-for="piece of pieceInView" :key="piece.coord.y * 9 + piece.coord.x"
           :x="piece.coord.x" :y="piece.coord.y" :types="piece.piece.types"
           :isDead="piece.piece.isDead" :group="piece.piece.group"
           @select="pieceOnSelect"></PieceComponent>
           <img src="../assets/img/RED/r_box.png" :style="`position: absolute; \
-          top: ${selectedY * 55 + 20}px; left: ${selectedX * 55 + 158}px;`" v-if="selectedX !== -1">
+          top: ${selectedY * 55 + 20}px; left: ${selectedX * 55 + 20}px;`" v-if="selectedX !== -1">
           <div class="map" @click="pieceOnMove"></div>
           <img src="../assets/img/BLACK/b_box.png" :style="`position: absolute; \
-          top: ${botY * 55 + 20}px; left: ${botX * 55 + 158}px;`" v-if="botX !== -1">
+          top: ${botY * 55 + 20}px; left: ${botX * 55 + 20}px;`" v-if="botX !== -1">
         </el-card>
         <el-button @click="changeMode">CHANGE MODE</el-button>
         <el-button @click="newGame">NEW GAME</el-button>
@@ -228,7 +228,7 @@ export default class Home extends Vue {
   color: white;
   background-color: #002329;
   padding: 0 0.5rem 0 0.5rem;
-  width: 20rem;
+  width: 20%;
   height: 100vh;
   display: flex;
   flex-direction: column;
@@ -237,11 +237,11 @@ export default class Home extends Vue {
 .home {
   position: relative;
   display: flex;
-  width: 50rem;
-  height: 36rem;
-  margin: 0 0 3rem 0;
+  width: 100%;
+  margin: 0 0 1% 0;
   align-items:center;
   justify-content:center;
+  padding: 0;
 }
 .map {
   width: 30rem;

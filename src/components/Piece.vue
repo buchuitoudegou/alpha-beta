@@ -18,7 +18,7 @@ export default class PieceComponent extends Vue {
 
   get pieceStyle(): string {
     const yOffset = this.y * 55 + 20;
-    const xOffset = this.x * 55 + 158;
+    const xOffset = this.x * 55 + 20;
     return `position: absolute; top: ${yOffset}px; left: ${xOffset}px;
       user-select: none;`;
   }
