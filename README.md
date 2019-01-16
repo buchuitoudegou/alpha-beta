@@ -2,7 +2,7 @@
 simple implement of alpha-beta pruning algorithm
 
 ## run
-install dependencies before launch the application: `yarn install`
+install dependencies before launching the application: `yarn install`
 
 exec `yarn serve` to launch the application at port `8080`
 
