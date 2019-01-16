@@ -1,5 +1,5 @@
 # alpha-beta-pruning
-simple implement of alpha-beta pruning algorithm
+simple implementation of alpha-beta pruning algorithm
 
 ## run
 install dependencies before launching the application: `yarn install`
